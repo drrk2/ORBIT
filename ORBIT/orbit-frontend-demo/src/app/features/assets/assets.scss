@@ -1,0 +1,141 @@
+.asset-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.asset-summary article {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+}
+.asset-summary-icon {
+  width: 35px;
+  height: 35px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+}
+.asset-summary-icon.purple {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+.asset-summary-icon.green {
+  color: var(--success);
+  background: var(--success-soft);
+}
+.asset-summary-icon.blue {
+  color: var(--info);
+  background: var(--info-soft);
+}
+.asset-summary-icon.red {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+.asset-summary p {
+  margin: 0;
+}
+.asset-summary strong,
+.asset-summary small {
+  display: block;
+}
+.asset-summary strong {
+  font-size: 17px;
+}
+.asset-summary small {
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 8px;
+}
+.asset-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.asset-cell > span {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 9px;
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+.asset-cell strong,
+.asset-cell small {
+  display: block;
+}
+.asset-cell strong {
+  color: var(--text);
+  font-size: 10px;
+}
+.asset-cell small {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 8px;
+}
+.serial {
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+}
+.asset-mobile {
+  padding: 14px;
+}
+.mobile-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 14px 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 9px;
+}
+.asset-mobile > button {
+  width: 100%;
+}
+.selected-asset {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 11px;
+  background: var(--primary-soft);
+}
+.selected-asset > span {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  color: white;
+  background: var(--primary);
+}
+.selected-asset strong,
+.selected-asset small {
+  display: block;
+}
+.selected-asset strong {
+  font-size: 11px;
+}
+.selected-asset small {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 9px;
+}
+.assignment-field {
+  margin-top: 18px;
+}
+
+@media (max-width: 950px) {
+  .asset-summary {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 520px) {
+  .asset-summary {
+    grid-template-columns: 1fr;
+  }
+}

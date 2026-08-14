@@ -1,0 +1,260 @@
+<header class="page-header">
+  <div>
+    <span class="page-eyebrow">INVENTARIO DE TI</span>
+    <h1>Activos</h1>
+    <p>Catálogo, disponibilidad y asignaciones de equipo empresarial.</p>
+  </div>
+  @if (store.can('admin', 'it')) {
+    <div class="page-actions">
+      <button class="primary-button" type="button" (click)="createOpen.set(true)">
+        <app-icon name="plus" [size]="16" /> Registrar activo
+      </button>
+    </div>
+  }
+</header>
+
+<section class="asset-summary">
+  <article class="card">
+    <span class="asset-summary-icon purple"><app-icon name="package" [size]="18" /></span>
+    <p>
+      <strong>{{ store.assets().length }}</strong
+      ><small>Total inventario</small>
+    </p>
+  </article>
+  <article class="card">
+    <span class="asset-summary-icon green"><app-icon name="check" [size]="18" /></span>
+    <p>
+      <strong>{{ availableCount() }}</strong
+      ><small>Disponibles</small>
+    </p>
+  </article>
+  <article class="card">
+    <span class="asset-summary-icon blue"><app-icon name="users" [size]="18" /></span>
+    <p>
+      <strong>{{ assignedCount() }}</strong
+      ><small>Asignados</small>
+    </p>
+  </article>
+  <article class="card">
+    <span class="asset-summary-icon red"><app-icon name="refresh" [size]="18" /></span>
+    <p>
+      <strong>{{ maintenanceCount() }}</strong
+      ><small>En mantenimiento</small>
+    </p>
+  </article>
+</section>
+
+<div class="toolbar">
+  <label class="search-field"
+    ><app-icon name="search" [size]="16" /><input
+      type="search"
+      placeholder="Buscar por activo, marca o número de serie..."
+      [value]="query()"
+      (input)="updateQuery($event)"
+  /></label>
+  <select [value]="statusFilter()" (change)="updateStatus($event)" aria-label="Filtrar por estado">
+    <option value="all">Todos los estados</option>
+    <option value="available">Disponibles</option>
+    <option value="assigned">Asignados</option>
+    <option value="maintenance">Mantenimiento</option>
+  </select>
+  <select [value]="typeFilter()" (change)="updateType($event)" aria-label="Filtrar por tipo">
+    <option value="all">Todos los tipos</option>
+    @for (type of assetTypes(); track type) {
+      <option [value]="type">{{ type }}</option>
+    }
+  </select>
+</div>
+
+<div class="card table-card desktop-table">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Activo</th>
+        <th>Identificación</th>
+        <th>Sede</th>
+        <th>Asignado a</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (asset of filteredAssets(); track asset.id) {
+        <tr>
+          <td>
+            <div class="asset-cell">
+              <span
+                ><app-icon [name]="asset.type === 'Laptop' ? 'laptop' : 'package'" [size]="18"
+              /></span>
+              <div>
+                <strong>{{ asset.name }}</strong
+                ><small>{{ asset.brand }} · {{ asset.model }}</small>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="cell-title serial">{{ asset.serial }}</span
+            ><span class="cell-subtitle">Alta {{ asset.purchaseDate | date: 'MMM y' }}</span>
+          </td>
+          <td>{{ store.findSite(asset.siteId) }}</td>
+          <td>{{ asset.assignedTo ? store.findEmployee(asset.assignedTo) : '—' }}</td>
+          <td>
+            <span [class]="'chip ' + asset.status">{{ asset.status | orbitLabel }}</span>
+          </td>
+          <td>
+            @if (store.can('admin', 'it') && asset.status === 'available') {
+              <button class="text-button" type="button" (click)="openAssignment(asset)">
+                Asignar
+              </button>
+            }
+            @if (store.can('admin', 'it') && asset.status === 'assigned') {
+              <button class="text-button" type="button" (click)="returnAsset(asset)">
+                Devolver
+              </button>
+            }
+            @if (!store.can('admin', 'it') || asset.status === 'maintenance') {
+              <span class="muted">—</span>
+            }
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <span class="empty-icon"><app-icon name="search" /></span><strong>Sin activos</strong>
+              <p>No hay coincidencias con los filtros actuales.</p>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<div class="mobile-list">
+  @for (asset of filteredAssets(); track asset.id) {
+    <article class="asset-mobile card">
+      <div class="asset-cell">
+        <span
+          ><app-icon [name]="asset.type === 'Laptop' ? 'laptop' : 'package'" [size]="18"
+        /></span>
+        <div>
+          <strong>{{ asset.name }}</strong
+          ><small>{{ asset.serial }}</small>
+        </div>
+      </div>
+      <div class="mobile-meta">
+        <span>{{ store.findSite(asset.siteId) }}</span
+        ><span [class]="'chip ' + asset.status">{{ asset.status | orbitLabel }}</span>
+      </div>
+      @if (store.can('admin', 'it') && asset.status === 'available') {
+        <button class="secondary-button" type="button" (click)="openAssignment(asset)">
+          Asignar activo
+        </button>
+      }
+      @if (store.can('admin', 'it') && asset.status === 'assigned') {
+        <button class="secondary-button" type="button" (click)="returnAsset(asset)">
+          Registrar devolución
+        </button>
+      }
+    </article>
+  }
+</div>
+
+@if (createOpen()) {
+  <div class="modal-backdrop" (click)="createOpen.set(false)">
+    <section class="modal" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <div>
+          <h2>Registrar activo</h2>
+          <p>Agrega un equipo al catálogo de inventario.</p>
+        </div>
+        <button class="close-button" type="button" (click)="createOpen.set(false)">
+          <app-icon name="close" [size]="17" />
+        </button>
+      </header>
+      <form [formGroup]="assetForm" (ngSubmit)="createAsset()">
+        <div class="modal-body form-grid">
+          <label class="field full"
+            >Nombre del activo<input formControlName="name" placeholder="Ej. MacBook Pro 14"
+          /></label>
+          <label class="field"
+            >Tipo<select formControlName="type">
+              <option>Laptop</option>
+              <option>Monitor</option>
+              <option>Teléfono</option>
+              <option>Accesorio</option>
+            </select></label
+          >
+          <label class="field">Marca<input formControlName="brand" placeholder="Apple" /></label>
+          <label class="field">Modelo<input formControlName="model" placeholder="M4 Pro" /></label>
+          <label class="field"
+            >Número de serie<input formControlName="serial" placeholder="ORB-XXX-00000"
+          /></label>
+          <label class="field"
+            >Sede<select formControlName="siteId">
+              @for (site of store.sites(); track site.id) {
+                <option [value]="site.id">{{ site.name }}</option>
+              }
+            </select></label
+          >
+          <label class="field"
+            >Fecha de compra<input type="date" formControlName="purchaseDate"
+          /></label>
+        </div>
+        <footer class="modal-footer">
+          <button class="secondary-button" type="button" (click)="createOpen.set(false)">
+            Cancelar</button
+          ><button class="primary-button" type="submit">Registrar activo</button>
+        </footer>
+      </form>
+    </section>
+  </div>
+}
+
+@if (assigning(); as asset) {
+  <div class="modal-backdrop" (click)="assigning.set(null)">
+    <section class="modal assignment-modal" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <div>
+          <h2>Asignar activo</h2>
+          <p>Selecciona al responsable del equipo.</p>
+        </div>
+        <button class="close-button" type="button" (click)="assigning.set(null)">
+          <app-icon name="close" [size]="17" />
+        </button>
+      </header>
+      <div class="modal-body">
+        <div class="selected-asset">
+          <span><app-icon name="laptop" [size]="21" /></span>
+          <div>
+            <strong>{{ asset.name }}</strong
+            ><small>{{ asset.serial }} · {{ asset.brand }} {{ asset.model }}</small>
+          </div>
+        </div>
+        <label class="field assignment-field"
+          >Empleado<select [value]="employeeToAssign()" (change)="updateEmployee($event)">
+            <option value="">Selecciona una persona</option>
+            @for (employee of store.employees(); track employee.id) {
+              @if (employee.status !== 'inactive') {
+                <option [value]="employee.id">{{ employee.name }} · {{ employee.jobTitle }}</option>
+              }
+            }
+          </select></label
+        >
+      </div>
+      <footer class="modal-footer">
+        <button class="secondary-button" type="button" (click)="assigning.set(null)">
+          Cancelar</button
+        ><button
+          class="primary-button"
+          type="button"
+          [disabled]="!employeeToAssign()"
+          (click)="confirmAssignment()"
+        >
+          Confirmar asignación
+        </button>
+      </footer>
+    </section>
+  </div>
+}

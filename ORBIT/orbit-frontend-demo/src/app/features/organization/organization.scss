@@ -1,0 +1,231 @@
+.company-card {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 20px;
+}
+.company-mark {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  color: white;
+  background: linear-gradient(145deg, #232a47, #11172b);
+  font-size: 16px;
+  font-weight: 800;
+}
+.company-info {
+  min-width: 210px;
+}
+.company-info .page-eyebrow {
+  margin-bottom: 5px;
+}
+.company-info h2 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: -0.025em;
+}
+.company-info p {
+  margin: 5px 0 0;
+  color: var(--text-muted);
+  font-size: 10px;
+}
+.company-stats {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  margin-left: auto;
+  padding: 0 30px;
+  border-right: 1px solid var(--border);
+}
+.company-stats div {
+  text-align: center;
+}
+.company-stats strong,
+.company-stats span {
+  display: block;
+}
+.company-stats strong {
+  font-size: 19px;
+}
+.company-stats span {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin: 28px 0 13px;
+}
+.section-heading h2 {
+  margin: 0;
+  font-size: 15px;
+}
+.section-heading p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 9px;
+}
+.section-heading > span {
+  color: var(--text-muted);
+  font-size: 9px;
+}
+.site-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.site-card {
+  overflow: hidden;
+}
+.site-cover {
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  color: white;
+  background: linear-gradient(135deg, #625bf6, #3933a9);
+}
+.site-cover.tone-1 {
+  background: linear-gradient(135deg, #3276e8, #164b9e);
+}
+.site-cover.tone-2 {
+  background: linear-gradient(135deg, #1d9c73, #11664b);
+}
+.site-cover > span {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: rgb(255 255 255 / 16%);
+}
+.site-cover small {
+  padding: 5px 7px;
+  border-radius: 5px;
+  background: rgb(255 255 255 / 15%);
+  font-size: 7px;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+}
+.site-content {
+  padding: 15px;
+}
+.site-content h3 {
+  margin: 0 0 7px;
+  font-size: 13px;
+}
+.site-content p {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 9px;
+}
+.site-content > small {
+  display: block;
+  min-height: 24px;
+  margin-top: 5px;
+  color: var(--text-muted);
+  font-size: 8px;
+  line-height: 1.4;
+}
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 8px;
+}
+.site-footer span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.departments-heading {
+  margin-top: 30px;
+}
+.department-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.department-cell > span {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: white;
+  font-size: 8px;
+  font-weight: 750;
+}
+.department-cell strong {
+  color: var(--text);
+  font-size: 10px;
+}
+.code-pill {
+  padding: 5px 7px;
+  border-radius: 5px;
+  color: var(--text-secondary);
+  background: #f0f2f5;
+  font-family: ui-monospace, monospace;
+  font-size: 8px;
+}
+.department-mobile {
+  padding: 14px;
+}
+.department-mobile p {
+  margin: 10px 0 5px;
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+.department-mobile small {
+  color: var(--text-muted);
+  font-size: 9px;
+}
+
+@media (max-width: 1050px) {
+  .company-card {
+    flex-wrap: wrap;
+  }
+  .company-stats {
+    order: 3;
+    width: 100%;
+    justify-content: space-around;
+    margin: 0;
+    padding: 15px 0 0;
+    border-top: 1px solid var(--border);
+    border-right: 0;
+  }
+  .company-card > .chip {
+    margin-left: auto;
+  }
+  .site-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-grid {
+    grid-template-columns: 1fr;
+  }
+  .company-info {
+    min-width: 0;
+    flex: 1;
+  }
+  .company-card > .chip {
+    display: none;
+  }
+}

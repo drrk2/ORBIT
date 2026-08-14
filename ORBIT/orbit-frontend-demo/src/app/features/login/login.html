@@ -1,0 +1,64 @@
+<main class="login-page">
+  <section class="login-story">
+    <div class="story-content">
+      <div class="brand"><span>O</span><strong>ORBIT</strong></div>
+      <p class="eyebrow">ENTERPRISE OPERATIONS PLATFORM</p>
+      <h1>Todo lo que tu empresa necesita, en una sola órbita.</h1>
+      <p class="intro">
+        Organiza personas, activos y solicitudes con procesos visibles de principio a fin.
+      </p>
+
+      <div class="flow-card">
+        <div><span>01</span><strong>RH registra</strong><small>Inicia el onboarding</small></div>
+        <i></i>
+        <div><span>02</span><strong>Manager aprueba</strong><small>Valida la solicitud</small></div>
+        <i></i>
+        <div><span>03</span><strong>TI entrega</strong><small>Asigna el activo</small></div>
+      </div>
+    </div>
+    <p class="story-footer">Prototipo frontend · Los datos permanecen únicamente en tu navegador</p>
+  </section>
+
+  <section class="login-panel">
+    <div class="login-card">
+      <div class="mobile-brand"><span>O</span><strong>ORBIT</strong></div>
+      <span class="demo-chip">DEMO INTERACTIVA</span>
+      <h2>Bienvenido de nuevo</h2>
+      <p>Ingresa con un perfil demo o elige un acceso rápido.</p>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <label>
+          Correo empresarial
+          <input type="email" formControlName="email" autocomplete="username" />
+        </label>
+        <label>
+          Contraseña
+          <input type="password" formControlName="password" autocomplete="current-password" />
+        </label>
+        @if (error()) {
+          <p class="form-error">{{ error() }}</p>
+        }
+        <button class="primary-button login-button" type="submit">
+          Iniciar sesión <app-icon name="arrow" [size]="17" />
+        </button>
+      </form>
+
+      <div class="divider"><span>o prueba un perfil</span></div>
+
+      <div class="demo-profiles">
+        @for (user of store.users(); track user.id) {
+          <button type="button" (click)="quickLogin(user.email)">
+            <span class="profile-avatar" [style.background]="user.color">{{ user.initials }}</span>
+            <span
+              ><strong>{{ user.name }}</strong
+              ><small>{{ user.role | orbitLabel }}</small></span
+            >
+            <app-icon name="arrow" [size]="15" />
+          </button>
+        }
+      </div>
+
+      <p class="credentials"><strong>Contraseña para todos:</strong> orbit2026</p>
+    </div>
+  </section>
+</main>

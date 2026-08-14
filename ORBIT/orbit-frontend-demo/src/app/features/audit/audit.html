@@ -1,0 +1,89 @@
+<header class="page-header">
+  <div>
+    <span class="page-eyebrow">IMMUTABLE AUDIT TRAIL</span>
+    <h1>Auditoría</h1>
+    <p>Trazabilidad de las acciones realizadas durante la demostración.</p>
+  </div>
+  <span class="audit-total"
+    ><app-icon name="history" [size]="16" /> {{ store.audit().length }} eventos</span
+  >
+</header>
+
+<section class="audit-notice card">
+  <span><app-icon name="shield" [size]="19" /></span>
+  <div>
+    <strong>Registro de demostración</strong>
+    <p>
+      Cada acción funcional agrega un evento. En producción, este registro será generado y protegido
+      por el backend.
+    </p>
+  </div>
+</section>
+
+<div class="toolbar">
+  <label class="search-field"
+    ><app-icon name="search" [size]="16" /><input
+      type="search"
+      placeholder="Buscar acción, actor o recurso..."
+      [value]="query()"
+      (input)="updateQuery($event)"
+  /></label>
+  <select
+    [value]="resourceFilter()"
+    (change)="updateResource($event)"
+    aria-label="Filtrar por recurso"
+  >
+    <option value="all">Todos los recursos</option>
+    @for (resource of resources(); track resource) {
+      <option [value]="resource">{{ resource }}</option>
+    }
+  </select>
+  <select [value]="roleFilter()" (change)="updateRole($event)" aria-label="Filtrar por perfil">
+    <option value="all">Todos los perfiles</option>
+    <option value="admin">Administración</option>
+    <option value="hr">Recursos Humanos</option>
+    <option value="manager">Manager</option>
+    <option value="it">Tecnología</option>
+  </select>
+</div>
+
+<div class="card audit-card">
+  <div class="audit-header-row">
+    <span>Evento</span><span>Actor</span><span>Recurso</span><span>Fecha y hora</span>
+  </div>
+  <div class="audit-list">
+    @for (entry of filteredAudit(); track entry.id; let first = $first) {
+      <article class="audit-row">
+        <div class="audit-event">
+          <span class="event-dot" [class.latest]="first"
+            ><app-icon name="history" [size]="14"
+          /></span>
+          <div>
+            <strong>{{ entry.action }}</strong>
+            <p>{{ entry.details }}</p>
+          </div>
+        </div>
+        <div class="audit-actor">
+          <span>{{ entry.actor.slice(0, 1) }}</span>
+          <div>
+            <strong>{{ entry.actor }}</strong
+            ><small>{{ entry.actorRole | orbitLabel }}</small>
+          </div>
+        </div>
+        <div>
+          <span class="resource-chip">{{ entry.resource }}</span
+          ><small class="resource-id">{{ entry.resourceId }}</small>
+        </div>
+        <time
+          >{{ entry.timestamp | date: 'd MMM y'
+          }}<small>{{ entry.timestamp | date: 'HH:mm:ss' }}</small></time
+        >
+      </article>
+    } @empty {
+      <div class="empty-state">
+        <span class="empty-icon"><app-icon name="search" /></span><strong>Sin eventos</strong>
+        <p>No hay coincidencias con los filtros actuales.</p>
+      </div>
+    }
+  </div>
+</div>

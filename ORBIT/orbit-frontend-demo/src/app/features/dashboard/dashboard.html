@@ -1,0 +1,143 @@
+<header class="page-header dashboard-header">
+  <div>
+    <span class="page-eyebrow">VISIÓN GENERAL</span>
+    <h1>{{ greeting() }}, {{ store.currentUser()?.name?.split(' ')?.[0] }}</h1>
+    <p>Esto es lo que está pasando hoy en Acme Corporation.</p>
+  </div>
+  <div class="page-actions">
+    @if (store.can('admin', 'hr')) {
+      <a class="primary-button" routerLink="/employees"
+        ><app-icon name="plus" [size]="16" /> Nuevo empleado</a
+      >
+    } @else if (store.can('manager')) {
+      <a class="primary-button" routerLink="/approvals"
+        ><app-icon name="approval" [size]="16" /> Revisar aprobaciones</a
+      >
+    } @else {
+      <a class="primary-button" routerLink="/requests"
+        ><app-icon name="requests" [size]="16" /> Gestionar solicitudes</a
+      >
+    }
+  </div>
+</header>
+
+<section class="metric-grid" aria-label="Métricas principales">
+  @for (metric of metrics(); track metric.label) {
+    <article class="metric-card">
+      <div class="metric-top">
+        <span>{{ metric.label }}</span>
+        <span class="metric-icon" [class]="'metric-icon ' + metric.tone">
+          <app-icon [name]="metric.icon" [size]="18" />
+        </span>
+      </div>
+      <div class="metric-value">
+        <strong>{{ metric.value }}</strong
+        ><small>{{ metric.note }}</small>
+      </div>
+    </article>
+  }
+</section>
+
+<section class="dashboard-grid">
+  <article class="card pipeline-card">
+    <div class="card-header">
+      <div>
+        <h2>Flujo de solicitudes</h2>
+        <p>Distribución por estado actual</p>
+      </div>
+      <a class="text-button" routerLink="/requests"
+        >Ver todas <app-icon name="arrow" [size]="14"
+      /></a>
+    </div>
+    <div class="pipeline-list">
+      @for (item of pipeline(); track item.status) {
+        <div class="pipeline-row">
+          <span class="pipeline-label">{{ item.label }}</span>
+          <div class="pipeline-track">
+            <span [class]="item.status" [style.width.%]="pipelineWidth(item.count)"></span>
+          </div>
+          <strong>{{ item.count }}</strong>
+        </div>
+      }
+    </div>
+  </article>
+
+  <article class="card onboarding-card">
+    <div class="card-header">
+      <div>
+        <h2>Onboarding activo</h2>
+        <p>Nuevos ingresos en progreso</p>
+      </div>
+      <a class="text-button" routerLink="/employees"
+        >Directorio <app-icon name="arrow" [size]="14"
+      /></a>
+    </div>
+    @if (onboarding().length) {
+      <div class="onboarding-list">
+        @for (employee of onboarding(); track employee.id) {
+          <div class="onboarding-item">
+            <span class="avatar-badge" [style.background]="employee.avatarColor">{{
+              employee.name | initials
+            }}</span>
+            <div class="onboarding-info">
+              <strong>{{ employee.name }}</strong>
+              <small>{{ store.findDepartment(employee.departmentId) }}</small>
+              <div class="progress-bar">
+                <span [style.width.%]="employee.onboardingProgress"></span>
+              </div>
+            </div>
+            <b>{{ employee.onboardingProgress }}%</b>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state compact">
+        <strong>Sin onboarding pendiente</strong>
+        <p>Todos los ingresos están completos.</p>
+      </div>
+    }
+  </article>
+
+  <article class="card activity-card">
+    <div class="card-header">
+      <div>
+        <h2>Actividad reciente</h2>
+        <p>Últimos cambios registrados</p>
+      </div>
+      <a class="text-button" routerLink="/audit"
+        >Ver auditoría <app-icon name="arrow" [size]="14"
+      /></a>
+    </div>
+    <div class="activity-list">
+      @for (entry of recentAudit(); track entry.id) {
+        <div class="activity-item">
+          <span class="activity-icon"><app-icon name="history" [size]="15" /></span>
+          <div>
+            <strong>{{ entry.action }}</strong>
+            <p>{{ entry.details }}</p>
+            <small>{{ entry.actor }} · {{ entry.timestamp | date: 'd MMM, HH:mm' }}</small>
+          </div>
+        </div>
+      }
+    </div>
+  </article>
+
+  <article class="card role-card">
+    <div class="role-glow"></div>
+    <span class="role-icon"><app-icon name="shield" [size]="21" /></span>
+    <span class="page-eyebrow">PERFIL ACTUAL</span>
+    <h2>{{ store.currentUser()?.role | orbitLabel }}</h2>
+    <p>
+      @if (store.can('hr')) {
+        Registra empleados e inicia solicitudes de onboarding.
+      } @else if (store.can('manager')) {
+        Revisa y decide las solicitudes pendientes de tu equipo.
+      } @else if (store.can('it')) {
+        Gestiona activos y completa las solicitudes aprobadas.
+      } @else {
+        Puedes recorrer y administrar todo el prototipo ORBIT.
+      }
+    </p>
+    <small>Cambia de perfil desde la barra superior para recorrer el flujo completo.</small>
+  </article>
+</section>

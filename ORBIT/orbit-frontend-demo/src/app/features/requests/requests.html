@@ -1,0 +1,333 @@
+<header class="page-header">
+  <div>
+    <span class="page-eyebrow">REQUEST MANAGEMENT</span>
+    <h1>Solicitudes</h1>
+    <p>Crea, aprueba y da seguimiento a las necesidades internas.</p>
+  </div>
+  <div class="page-actions">
+    <button class="primary-button" type="button" (click)="createOpen.set(true)">
+      <app-icon name="plus" [size]="16" /> Nueva solicitud
+    </button>
+  </div>
+</header>
+
+<section class="request-summary">
+  <article class="card">
+    <span class="request-number">{{ store.requests().length }}</span>
+    <p>Total solicitudes<small>Historial completo</small></p>
+  </article>
+  <article class="card">
+    <span class="request-number warning">{{ pendingCount() }}</span>
+    <p>Por aprobar<small>Esperando manager</small></p>
+  </article>
+  <article class="card">
+    <span class="request-number info">{{ activeCount() }}</span>
+    <p>En operación<small>Aprobadas y en proceso</small></p>
+  </article>
+  <article class="card">
+    <span class="request-number success">{{ completedCount() }}</span>
+    <p>Completadas<small>Flujos terminados</small></p>
+  </article>
+</section>
+
+<div class="toolbar">
+  <label class="search-field"
+    ><app-icon name="search" [size]="16" /><input
+      type="search"
+      placeholder="Buscar por folio, solicitud o empleado..."
+      [value]="query()"
+      (input)="updateQuery($event)"
+  /></label>
+  <select [value]="statusFilter()" (change)="updateStatus($event)" aria-label="Filtrar por estado">
+    <option value="all">Todos los estados</option>
+    <option value="pending_approval">Pendiente de aprobación</option>
+    <option value="approved">Aprobada</option>
+    <option value="in_progress">En proceso</option>
+    <option value="completed">Completada</option>
+    <option value="rejected">Rechazada</option>
+  </select>
+</div>
+
+<div class="card table-card desktop-table">
+  <table class="data-table requests-table">
+    <thead>
+      <tr>
+        <th>Solicitud</th>
+        <th>Solicitante / empleado</th>
+        <th>Prioridad</th>
+        <th>Fecha</th>
+        <th>Estado</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (request of filteredRequests(); track request.id) {
+        <tr>
+          <td>
+            <div class="request-title">
+              <span
+                ><app-icon
+                  [name]="request.category === 'Equipo' ? 'laptop' : 'requests'"
+                  [size]="17"
+              /></span>
+              <div>
+                <strong>{{ request.title }}</strong
+                ><small>{{ request.code }} · {{ request.category }}</small>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="cell-title">{{ store.findEmployee(request.employeeId) }}</span
+            ><span class="cell-subtitle">Creada por {{ requesterName(request.requesterId) }}</span>
+          </td>
+          <td>
+            <span [class]="'chip ' + request.priority">{{ request.priority | orbitLabel }}</span>
+          </td>
+          <td>
+            <span class="cell-title">{{ request.createdAt | date: 'd MMM y' }}</span
+            ><span class="cell-subtitle">{{ request.createdAt | date: 'HH:mm' }}</span>
+          </td>
+          <td>
+            <span [class]="'chip ' + request.status">{{ request.status | orbitLabel }}</span>
+          </td>
+          <td>
+            <div class="row-actions">
+              @if (store.can('admin', 'manager') && request.status === 'pending_approval') {
+                <button
+                  class="approve-mini"
+                  type="button"
+                  (click)="store.approveRequest(request.id)"
+                  title="Aprobar"
+                >
+                  <app-icon name="check" [size]="14" />
+                </button>
+                <button
+                  class="reject-mini"
+                  type="button"
+                  (click)="store.rejectRequest(request.id)"
+                  title="Rechazar"
+                >
+                  <app-icon name="close" [size]="14" />
+                </button>
+              } @else if (
+                store.can('admin', 'it') && ['approved', 'in_progress'].includes(request.status)
+              ) {
+                @if (request.category === 'Equipo') {
+                  <button class="text-button" type="button" (click)="openFulfillment(request)">
+                    Asignar equipo
+                  </button>
+                } @else if (request.status === 'approved') {
+                  <button
+                    class="text-button"
+                    type="button"
+                    (click)="store.startRequest(request.id)"
+                  >
+                    Iniciar
+                  </button>
+                } @else {
+                  <button
+                    class="text-button"
+                    type="button"
+                    (click)="store.completeRequest(request.id)"
+                  >
+                    Completar
+                  </button>
+                }
+              } @else {
+                <span class="muted">—</span>
+              }
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6">
+            <div class="empty-state">
+              <span class="empty-icon"><app-icon name="search" /></span
+              ><strong>Sin solicitudes</strong>
+              <p>No hay coincidencias con los filtros actuales.</p>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<div class="mobile-list">
+  @for (request of filteredRequests(); track request.id) {
+    <article class="request-mobile card">
+      <div class="request-mobile-header">
+        <span class="request-icon"
+          ><app-icon [name]="request.category === 'Equipo' ? 'laptop' : 'requests'" [size]="17"
+        /></span>
+        <div>
+          <strong>{{ request.title }}</strong
+          ><small>{{ request.code }} · {{ store.findEmployee(request.employeeId) }}</small>
+        </div>
+        <span [class]="'chip ' + request.status">{{ request.status | orbitLabel }}</span>
+      </div>
+      <div class="request-mobile-meta">
+        <span>{{ request.createdAt | date: 'd MMM' }}</span
+        ><span [class]="'chip ' + request.priority">{{ request.priority | orbitLabel }}</span>
+      </div>
+      @if (store.can('admin', 'manager') && request.status === 'pending_approval') {
+        <div class="mobile-actions">
+          <button class="danger-button" type="button" (click)="store.rejectRequest(request.id)">
+            Rechazar</button
+          ><button class="primary-button" type="button" (click)="store.approveRequest(request.id)">
+            Aprobar
+          </button>
+        </div>
+      }
+      @if (store.can('admin', 'it') && ['approved', 'in_progress'].includes(request.status)) {
+        @if (request.category === 'Equipo') {
+          <button
+            class="primary-button full-action"
+            type="button"
+            (click)="openFulfillment(request)"
+          >
+            Asignar equipo
+          </button>
+        } @else if (request.status === 'approved') {
+          <button
+            class="primary-button full-action"
+            type="button"
+            (click)="store.startRequest(request.id)"
+          >
+            Iniciar solicitud
+          </button>
+        } @else {
+          <button
+            class="primary-button full-action"
+            type="button"
+            (click)="store.completeRequest(request.id)"
+          >
+            Completar solicitud
+          </button>
+        }
+      }
+    </article>
+  }
+</div>
+
+@if (createOpen()) {
+  <div class="modal-backdrop" (click)="createOpen.set(false)">
+    <section class="modal" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <div>
+          <h2>Nueva solicitud</h2>
+          <p>El manager seleccionado deberá aprobarla.</p>
+        </div>
+        <button class="close-button" type="button" (click)="createOpen.set(false)">
+          <app-icon name="close" [size]="17" />
+        </button>
+      </header>
+      <form [formGroup]="requestForm" (ngSubmit)="createRequest()">
+        <div class="modal-body form-grid">
+          <label class="field full"
+            >Título<input formControlName="title" placeholder="Ej. Laptop para nuevo ingreso"
+          /></label>
+          <label class="field"
+            >Categoría<select formControlName="category">
+              <option>Equipo</option>
+              <option>Acceso</option>
+              <option>Software</option>
+              <option>Soporte</option>
+              <option>Otro</option>
+            </select></label
+          >
+          <label class="field"
+            >Prioridad<select formControlName="priority">
+              <option value="low">Baja</option>
+              <option value="medium">Media</option>
+              <option value="high">Alta</option>
+              <option value="urgent">Urgente</option>
+            </select></label
+          >
+          <label class="field"
+            >Empleado<select formControlName="employeeId">
+              @for (employee of store.employees(); track employee.id) {
+                @if (employee.status !== 'inactive') {
+                  <option [value]="employee.id">{{ employee.name }}</option>
+                }
+              }
+            </select></label
+          >
+          <label class="field"
+            >Manager aprobador<select formControlName="approverId">
+              @for (employee of store.employees(); track employee.id) {
+                @if (employee.jobTitle.includes('Manager')) {
+                  <option [value]="employee.id">{{ employee.name }}</option>
+                }
+              }
+            </select></label
+          >
+          <label class="field full"
+            >Descripción<textarea
+              formControlName="description"
+              placeholder="Describe qué se necesita y para cuándo."
+            ></textarea>
+          </label>
+        </div>
+        <footer class="modal-footer">
+          <button class="secondary-button" type="button" (click)="createOpen.set(false)">
+            Cancelar</button
+          ><button class="primary-button" type="submit">Enviar a aprobación</button>
+        </footer>
+      </form>
+    </section>
+  </div>
+}
+
+@if (fulfilling(); as request) {
+  <div class="modal-backdrop" (click)="fulfilling.set(null)">
+    <section class="modal" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <div>
+          <h2>Asignar equipo</h2>
+          <p>Completa la solicitud y el onboarding.</p>
+        </div>
+        <button class="close-button" type="button" (click)="fulfilling.set(null)">
+          <app-icon name="close" [size]="17" />
+        </button>
+      </header>
+      <div class="modal-body">
+        <div class="fulfillment-summary">
+          <span><app-icon name="requests" [size]="19" /></span>
+          <div>
+            <strong>{{ request.title }}</strong
+            ><small>{{ request.code }} · Para {{ store.findEmployee(request.employeeId) }}</small>
+          </div>
+        </div>
+        <label class="field fulfillment-field"
+          >Activo disponible<select [value]="selectedAssetId()" (change)="updateAsset($event)">
+            <option value="">Selecciona un activo</option>
+            @for (asset of matchingAssets(); track asset.id) {
+              <option [value]="asset.id">
+                {{ asset.name }} · {{ asset.serial }} · {{ store.findSite(asset.siteId) }}
+              </option>
+            }
+          </select></label
+        >
+        @if (!matchingAssets().length) {
+          <p class="availability-warning">
+            No hay equipos compatibles disponibles. Registra o devuelve un activo para continuar.
+          </p>
+        }
+      </div>
+      <footer class="modal-footer">
+        <button class="secondary-button" type="button" (click)="fulfilling.set(null)">
+          Cancelar</button
+        ><button
+          class="primary-button"
+          type="button"
+          [disabled]="!selectedAssetId()"
+          (click)="fulfill()"
+        >
+          Asignar y completar
+        </button>
+      </footer>
+    </section>
+  </div>
+}
