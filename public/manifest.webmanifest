@@ -1,0 +1,19 @@
+{
+  "name": "ORBIT Enterprise Operations Platform",
+  "short_name": "ORBIT",
+  "description": "Demo frontend para operaciones empresariales.",
+  "theme_color": "#101426",
+  "background_color": "#f5f6fa",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "lang": "es-MX",
+  "icons": [
+    {
+      "src": "icons/orbit-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+<div class="page-intro">
+  <div>
+    <p class="eyebrow">VIERNES, 14 DE AGOSTO</p>
+    <h2>Buenas tardes, {{ store.session()?.name?.split(' ')?.[0] }}</h2>
+    <p>Esto es lo que está ocurriendo hoy en NovaTek.</p>
+  </div>
+  <button type="button" class="button button-ghost" (click)="resetDemo()">Restaurar demo</button>
+</div>
+
+<div class="metric-grid">
+  <article class="metric-card metric-violet">
+    <div class="metric-top"><span>Empleados activos</span><i>◎</i></div>
+    <strong>{{ store.activeEmployees().length }}</strong>
+    <p><span class="trend-up">+1 este mes</span> · 4 sedes</p>
+  </article>
+  <article class="metric-card metric-teal">
+    <div class="metric-top"><span>Activos disponibles</span><i>▣</i></div>
+    <strong>{{ store.availableAssets().length }}</strong>
+    <p>de {{ store.assets().length }} activos registrados</p>
+  </article>
+  <article class="metric-card metric-amber">
+    <div class="metric-top"><span>Por aprobar</span><i>◇</i></div>
+    <strong>{{ store.pendingRequests().length }}</strong>
+    <p><span class="trend-warn">Requieren atención</span></p>
+  </article>
+  <article class="metric-card metric-blue">
+    <div class="metric-top"><span>Solicitudes completadas</span><i>✓</i></div>
+    <strong>{{ completionRate() }}%</strong>
+    <p>del historial en este demo</p>
+  </article>
+</div>
+
+<div class="dashboard-grid">
+  <article class="panel onboarding-panel">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">FLUJO DESTACADO</p>
+        <h3>Onboarding de Sofía Torres</h3>
+      </div>
+      <span [class]="statusClass(spotlightRequest()?.status ?? 'Pendiente')">{{
+        spotlightRequest()?.status
+      }}</span>
+    </div>
+    <div class="person-summary">
+      <span class="avatar avatar-coral">ST</span>
+      <div>
+        <strong>Frontend Developer</strong
+        ><small>Tecnología · Sede Guadalajara · Ingreso hoy</small>
+      </div>
+    </div>
+    <div class="workflow-steps">
+      <div class="workflow-step done">
+        <span>✓</span>
+        <div><strong>Empleado registrado</strong><small>Recursos Humanos · 09:40</small></div>
+      </div>
+      <div class="workflow-line done"></div>
+      <div class="workflow-step done">
+        <span>✓</span>
+        <div><strong>Solicitud generada</strong><small>ORBIT Workflow · 09:42</small></div>
+      </div>
+      <div class="workflow-line" [class.done]="spotlightRequest()?.status !== 'Pendiente'"></div>
+      <div
+        class="workflow-step"
+        [class.done]="spotlightRequest()?.status !== 'Pendiente'"
+        [class.current]="spotlightRequest()?.status === 'Pendiente'"
+      >
+        <span>{{ spotlightRequest()?.status === 'Pendiente' ? '3' : '✓' }}</span>
+        <div>
+          <strong>Aprobación del manager</strong
+          ><small>{{
+            spotlightRequest()?.status === 'Pendiente'
+              ? 'Esperando a Carlos Ramírez'
+              : 'Decisión registrada'
+          }}</small>
+        </div>
+      </div>
+      <div class="workflow-line" [class.done]="spotlightRequest()?.status === 'Completada'"></div>
+      <div class="workflow-step" [class.done]="spotlightRequest()?.status === 'Completada'">
+        <span>{{ spotlightRequest()?.status === 'Completada' ? '✓' : '4' }}</span>
+        <div>
+          <strong>Asignación de equipo</strong
+          ><small>{{
+            spotlightRequest()?.status === 'Completada'
+              ? 'Activo entregado y auditado'
+              : 'Pendiente de Tecnología'
+          }}</small>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="text-button" (click)="navigate('approvals')">
+      Continuar el flujo <span>→</span>
+    </button>
+  </article>
+
+  <article class="panel activity-panel">
+    <div class="panel-heading">
+      <div>
+        <p class="eyebrow">EN TIEMPO REAL</p>
+        <h3>Actividad reciente</h3>
+      </div>
+      <button class="text-button compact" type="button" (click)="navigate('audit')">
+        Ver todo
+      </button>
+    </div>
+    <div class="activity-list">
+      @for (entry of store.audit().slice(0, 5); track entry.id) {
+        <div class="activity-item">
+          <span class="activity-dot"></span>
+          <div>
+            <p>
+              <strong>{{ entry.actor }}</strong> · {{ entry.action }}
+            </p>
+            <small>{{ entry.detail }}</small>
+          </div>
+          <time>{{ entry.timestamp }}</time>
+        </div>
+      }
+    </div>
+  </article>
+</div>
+
+<div class="quick-actions">
+  <p>Acciones rápidas</p>
+  <button
+    type="button"
+    (click)="ui.openEmployeeModal()"
+    [disabled]="!store.hasPermission('employee.write')"
+  >
+    <span>＋</span> Nuevo empleado
+  </button>
+  <button type="button" (click)="ui.openRequestModal()"><span>◇</span> Crear solicitud</button>
+  <button type="button" (click)="navigate('assets')"><span>▣</span> Consultar inventario</button>
+</div>

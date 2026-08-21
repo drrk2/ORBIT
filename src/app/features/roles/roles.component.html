@@ -1,0 +1,102 @@
+<div class="page-intro compact-intro">
+  <div>
+    <h2>Control de acceso</h2>
+    <p>Matriz RBAC simplificada para el alcance del MVP.</p>
+  </div>
+  <span class="subtle-badge">Frontend demo</span>
+</div>
+<div class="role-card-grid">
+  @for (
+    role of [
+      {
+        name: 'Recursos Humanos',
+        initials: 'RH',
+        color: 'coral',
+        people: 2,
+        description: 'Gestiona empleados y procesos de ingreso.',
+      },
+      {
+        name: 'Manager',
+        initials: 'MG',
+        color: 'violet',
+        people: 5,
+        description: 'Revisa y decide solicitudes de su equipo.',
+      },
+      {
+        name: 'Tecnología',
+        initials: 'TI',
+        color: 'teal',
+        people: 3,
+        description: 'Administra inventario y asignaciones.',
+      },
+      {
+        name: 'Administrador',
+        initials: 'AD',
+        color: 'blue',
+        people: 1,
+        description: 'Configura y consulta todos los módulos.',
+      },
+    ];
+    track role.name
+  ) {
+    <article class="role-card panel">
+      <span class="role-avatar" [ngClass]="role.color">{{ role.initials }}</span>
+      <div>
+        <h3>{{ role.name }}</h3>
+        <p>{{ role.description }}</p>
+        <small>{{ role.people }} usuarios asignados</small>
+      </div>
+    </article>
+  }
+</div>
+<article class="panel permissions-panel">
+  <div class="panel-heading">
+    <div>
+      <p class="eyebrow">MATRIZ RBAC</p>
+      <h3>Permisos por recurso y acción</h3>
+    </div>
+    <span class="subtle-badge">Mínimo privilegio</span>
+  </div>
+  <div class="table-scroll permission-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Permiso</th>
+          <th>Recursos Humanos</th>
+          <th>Manager</th>
+          <th>Tecnología</th>
+          <th>Administrador</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (
+          permission of [
+            { label: 'Ver dashboard', rh: true, mg: true, ti: true },
+            { label: 'Crear y editar empleados', rh: true, mg: false, ti: false },
+            { label: 'Crear solicitudes', rh: true, mg: false, ti: false },
+            { label: 'Aprobar solicitudes', rh: false, mg: true, ti: false },
+            { label: 'Asignar y devolver activos', rh: false, mg: false, ti: true },
+            { label: 'Consultar auditoría', rh: true, mg: true, ti: true },
+          ];
+          track permission.label
+        ) {
+          <tr>
+            <td>
+              <strong>{{ permission.label }}</strong>
+            </td>
+            <td>
+              <span [class.allowed]="permission.rh">{{ permission.rh ? '✓' : '—' }}</span>
+            </td>
+            <td>
+              <span [class.allowed]="permission.mg">{{ permission.mg ? '✓' : '—' }}</span>
+            </td>
+            <td>
+              <span [class.allowed]="permission.ti">{{ permission.ti ? '✓' : '—' }}</span>
+            </td>
+            <td><span class="allowed">✓</span></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</article>

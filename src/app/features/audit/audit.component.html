@@ -1,0 +1,40 @@
+<div class="page-intro compact-intro">
+  <div>
+    <h2>Trazabilidad completa</h2>
+    <p>Cada acción sensible del demo queda registrada.</p>
+  </div>
+  <span class="immutable-badge"><i></i> Registro inmutable</span>
+</div>
+<article class="panel audit-panel">
+  <div class="audit-toolbar">
+    <div class="filter-chips">
+      <button class="active">Todos los eventos</button><button>Empleados</button
+      ><button>Activos</button><button>Solicitudes</button>
+    </div>
+    <span>{{ store.audit().length }} eventos</span>
+  </div>
+  <div class="audit-list">
+    @for (entry of store.audit(); track entry.id; let first = $first) {
+      <div class="audit-row">
+        <div class="audit-rail">
+          <span [class.fresh]="first"></span>
+          @if (!$last) {
+            <i></i>
+          }
+        </div>
+        <div class="audit-time">
+          <strong>{{ entry.timestamp }}</strong
+          ><small>{{ entry.id }}</small>
+        </div>
+        <div class="audit-event">
+          <h3>{{ entry.action }}</h3>
+          <p>{{ entry.detail }}</p>
+          <div>
+            <span class="actor-chip">{{ entry.actor }}</span
+            ><span class="resource-chip">{{ entry.resource }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</article>

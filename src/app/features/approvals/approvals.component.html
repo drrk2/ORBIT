@@ -1,0 +1,111 @@
+<div class="page-intro compact-intro">
+  <div>
+    <h2>Decisiones pendientes</h2>
+    <p>Aprueba como Manager y asigna el equipo como Tecnología.</p>
+  </div>
+</div>
+@if (!store.hasPermission('request.approve') && !store.hasPermission('asset.assign')) {
+  <div class="permission-banner">
+    <span>i</span> Cambia a Manager para aprobar o a Tecnología para completar la asignación.
+  </div>
+}
+<div class="approval-layout">
+  <section>
+    <p class="section-kicker">ESPERANDO APROBACIÓN · {{ store.pendingRequests().length }}</p>
+    <div class="approval-list">
+      @for (request of store.pendingRequests(); track request.id) {
+        <article class="approval-card panel">
+          <div class="approval-card-top">
+            <span class="request-type-icon">▰</span>
+            <div>
+              <span class="resource-id">{{ request.id }}</span>
+              <h3>{{ request.title }}</h3>
+            </div>
+            <span class="priority priority-high">{{ request.priority }}</span>
+          </div>
+          <div class="approval-person">
+            <span class="avatar avatar-small avatar-coral"
+              >{{ request.employeeName.slice(0, 1)
+              }}{{ request.employeeName.split(' ')[1]?.slice(0, 1) }}</span
+            >
+            <div>
+              <strong>{{ request.employeeName }}</strong
+              ><small>{{ request.category }} · {{ request.requestedAt }}</small>
+            </div>
+          </div>
+          <div class="approval-meta">
+            <div>
+              <span>Manager responsable</span><strong>{{ request.approver }}</strong>
+            </div>
+            <div><span>SLA restante</span><strong>6 h 18 min</strong></div>
+          </div>
+          <div class="approval-actions">
+            <button
+              type="button"
+              class="button button-danger-ghost"
+              (click)="reject(request.id)"
+              [disabled]="!store.hasPermission('request.approve')"
+            >
+              Rechazar</button
+            ><button
+              type="button"
+              class="button button-primary"
+              (click)="approve(request.id)"
+              [disabled]="!store.hasPermission('request.approve')"
+            >
+              Aprobar solicitud
+            </button>
+          </div>
+        </article>
+      } @empty {
+        <div class="empty-state panel">
+          <span>✓</span>
+          <h3>Todo aprobado</h3>
+          <p>No hay solicitudes esperando una decisión.</p>
+        </div>
+      }
+    </div>
+  </section>
+  <section>
+    <p class="section-kicker">LISTAS PARA ASIGNAR · {{ store.approvedRequests().length }}</p>
+    <div class="approval-list">
+      @for (request of store.approvedRequests(); track request.id) {
+        <article class="assignment-card panel">
+          <div class="approval-card-top">
+            <span class="request-type-icon success">✓</span>
+            <div>
+              <span class="resource-id">{{ request.id }}</span>
+              <h3>{{ request.employeeName }}</h3>
+              <small>{{ request.title }}</small>
+            </div>
+          </div>
+          <label class="field"
+            ><span>Activo disponible</span
+            ><select [(ngModel)]="assignmentSelections[request.id]">
+              <option value="">Selecciona un activo</option>
+              @for (asset of store.availableAssets(); track asset.id) {
+                <option [value]="asset.id">
+                  {{ asset.id }} · {{ asset.brand }} {{ asset.model }}
+                </option>
+              }
+            </select></label
+          >
+          <button
+            type="button"
+            class="button button-dark button-full"
+            (click)="assign(request.id)"
+            [disabled]="!store.hasPermission('asset.assign')"
+          >
+            Asignar y completar onboarding
+          </button>
+        </article>
+      } @empty {
+        <div class="empty-state panel compact-empty">
+          <span>⌁</span>
+          <h3>Sin asignaciones pendientes</h3>
+          <p>Las solicitudes aprobadas aparecerán aquí.</p>
+        </div>
+      }
+    </div>
+  </section>
+</div>

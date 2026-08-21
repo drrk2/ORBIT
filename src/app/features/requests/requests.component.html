@@ -1,0 +1,73 @@
+<div class="page-intro compact-intro">
+  <div>
+    <h2>Solicitudes internas</h2>
+    <p>Seguimiento centralizado de requerimientos operativos.</p>
+  </div>
+  <button type="button" class="button button-primary" (click)="ui.openRequestModal()">
+    ＋ Nueva solicitud
+  </button>
+</div>
+<div class="request-stats">
+  <article>
+    <span>Pendientes</span><strong>{{ store.pendingRequests().length }}</strong
+    ><i class="dot amber"></i>
+  </article>
+  <article>
+    <span>Aprobadas</span><strong>{{ store.approvedRequests().length }}</strong
+    ><i class="dot blue"></i>
+  </article>
+  <article>
+    <span>Completadas</span><strong>{{ store.completedRequests().length }}</strong
+    ><i class="dot teal"></i>
+  </article>
+</div>
+<article class="panel data-panel">
+  <div class="table-toolbar">
+    <div class="filter-chips">
+      <button class="active">Todas</button><button>Mis solicitudes</button
+      ><button>Alta prioridad</button>
+    </div>
+    <span>{{ filteredRequests().length }} solicitudes</span>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Solicitud</th>
+          <th>Solicitante</th>
+          <th>Categoría</th>
+          <th>Prioridad</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (request of filteredRequests(); track request.id) {
+          <tr>
+            <td>
+              <div>
+                <strong>{{ request.title }}</strong
+                ><small class="block-id">{{ request.id }}</small>
+              </div>
+            </td>
+            <td>{{ request.employeeName }}</td>
+            <td>{{ request.category }}</td>
+            <td>
+              <span class="priority" [class.priority-high]="request.priority === 'Alta'">{{
+                request.priority
+              }}</span>
+            </td>
+            <td>
+              <span [class]="statusClass(request.status)">{{ request.status }}</span>
+            </td>
+            <td>{{ request.requestedAt }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="empty-cell">No encontramos solicitudes con ese criterio.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</article>

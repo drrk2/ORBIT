@@ -1,0 +1,83 @@
+<div class="page-intro compact-intro">
+  <div>
+    <h2>Estructura de NovaTek</h2>
+    <p>Vista organizacional de la compañía, sus sedes y equipos.</p>
+  </div>
+</div>
+<div class="org-overview">
+  <article class="company-card panel">
+    <div class="company-mark">N</div>
+    <div>
+      <p class="eyebrow">COMPAÑÍA</p>
+      <h3>NovaTek Solutions México</h3>
+      <p>Tecnología empresarial · 5 empleados en este demo</p>
+    </div>
+    <span class="status status-activo">Activa</span>
+  </article>
+  <div class="org-stats">
+    <div><strong>4</strong><span>Sedes</span></div>
+    <div><strong>5</strong><span>Departamentos</span></div>
+    <div><strong>7</strong><span>Equipos</span></div>
+    <div><strong>5</strong><span>Managers</span></div>
+  </div>
+</div>
+<article class="panel org-chart-panel">
+  <div class="panel-heading">
+    <div>
+      <p class="eyebrow">ORGANIGRAMA</p>
+      <h3>Departamentos y responsables</h3>
+    </div>
+    <span class="subtle-badge">Actualizado hoy</span>
+  </div>
+  <div class="org-tree">
+    <div class="org-node org-root">
+      <span class="avatar avatar-blue">MS</span><strong>Dirección General</strong
+      ><small>Mariana Silva</small>
+    </div>
+    <div class="org-connector"></div>
+    <div class="department-grid">
+      <div class="org-node">
+        <span class="node-icon violet">⌘</span><strong>Tecnología</strong
+        ><small>Carlos Ramírez · 2 personas</small>
+        <div class="node-tags"><span>Desarrollo</span><span>Soporte TI</span></div>
+      </div>
+      <div class="org-node">
+        <span class="node-icon coral">◎</span><strong>Recursos Humanos</strong
+        ><small>Ana Martínez · 1 persona</small>
+        <div class="node-tags"><span>People Ops</span></div>
+      </div>
+      <div class="org-node">
+        <span class="node-icon teal">◇</span><strong>Producto</strong
+        ><small>Valeria Soto · 1 persona</small>
+        <div class="node-tags"><span>Diseño</span></div>
+      </div>
+      <div class="org-node">
+        <span class="node-icon amber">▤</span><strong>Finanzas</strong
+        ><small>Ricardo Leal · 1 persona</small>
+        <div class="node-tags"><span>Análisis</span></div>
+      </div>
+    </div>
+  </div>
+</article>
+<div class="site-grid">
+  @for (
+    site of [
+      { city: 'Guadalajara', code: 'GDL', people: 3, main: true },
+      { city: 'Ciudad de México', code: 'CDMX', people: 1, main: false },
+      { city: 'Monterrey', code: 'MTY', people: 1, main: false },
+      { city: 'Remoto México', code: 'REM', people: 0, main: false },
+    ];
+    track site.code
+  ) {
+    <article class="site-card panel">
+      <span class="site-code">{{ site.code }}</span>
+      <div>
+        <strong>{{ site.city }}</strong
+        ><small>{{ site.people }} personas</small>
+      </div>
+      @if (site.main) {
+        <span class="subtle-badge">Principal</span>
+      }
+    </article>
+  }
+</div>

@@ -1,0 +1,310 @@
+@if (!store.session()) {
+  <main class="login-page">
+    <section class="login-story" aria-labelledby="login-title">
+      <div class="brand brand-large">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span>ORBIT</span>
+      </div>
+      <div class="story-copy">
+        <p class="eyebrow">ENTERPRISE OPERATIONS PLATFORM</p>
+        <h1 id="login-title">Tu empresa, en una sola órbita.</h1>
+        <p class="story-lead">
+          Personas, activos y solicitudes conectados en un flujo operativo claro, medible y
+          auditable.
+        </p>
+      </div>
+      <div class="story-flow" aria-label="Flujo principal del demo">
+        <span>Empleado</span><i>→</i><span>Aprobación</span><i>→</i><span>Activo</span><i>→</i
+        ><span>Auditoría</span>
+      </div>
+      <p class="story-footnote">
+        Demo frontend · Los datos se guardan únicamente en este navegador
+      </p>
+    </section>
+
+    <section class="login-panel">
+      <div class="login-card">
+        <div class="login-heading">
+          <span class="mobile-brand-mark brand-mark" aria-hidden="true"><span></span></span>
+          <div>
+            <p class="eyebrow">ACCESO DEMO</p>
+            <h2>Elige un perfil</h2>
+          </div>
+        </div>
+        <p class="muted">
+          Cada perfil activa los permisos necesarios para recorrer el flujo completo del MVP.
+        </p>
+        <div class="profile-list">
+          <button type="button" class="profile-option" (click)="login('Recursos Humanos')">
+            <span class="avatar avatar-coral">AM</span
+            ><span class="profile-copy"
+              ><strong>Ana Martínez</strong><small>Recursos Humanos · Crea empleados</small></span
+            ><span class="arrow">→</span>
+          </button>
+          <button type="button" class="profile-option" (click)="login('Manager')">
+            <span class="avatar avatar-violet">CR</span
+            ><span class="profile-copy"
+              ><strong>Carlos Ramírez</strong><small>Manager · Aprueba solicitudes</small></span
+            ><span class="arrow">→</span>
+          </button>
+          <button type="button" class="profile-option" (click)="login('Tecnología')">
+            <span class="avatar avatar-teal">LH</span
+            ><span class="profile-copy"
+              ><strong>Luis Herrera</strong><small>Tecnología · Asigna activos</small></span
+            ><span class="arrow">→</span>
+          </button>
+          <button type="button" class="profile-option" (click)="login('Administrador')">
+            <span class="avatar avatar-blue">MS</span
+            ><span class="profile-copy"
+              ><strong>Mariana Silva</strong><small>Administrador · Acceso completo</small></span
+            ><span class="arrow">→</span>
+          </button>
+        </div>
+        <div class="demo-note">
+          <span aria-hidden="true">i</span>
+          <p>No necesitas contraseña ni conexión a servicios externos.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+} @else {
+  <div class="app-shell">
+    <aside class="sidebar" [class.sidebar-open]="menuOpen()">
+      <div class="sidebar-header">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"><span></span></span><span>ORBIT</span>
+        </div>
+        <span class="demo-pill">DEMO</span>
+      </div>
+      <div class="workspace-card">
+        <span class="workspace-logo">N</span
+        ><span><strong>NovaTek</strong><small>Empresa principal</small></span
+        ><span class="workspace-chevron">⌄</span>
+      </div>
+      <nav class="primary-nav" aria-label="Navegación principal">
+        <p class="nav-section-label">OPERACIONES</p>
+        @for (item of navItems; track item.id) {
+          <button
+            type="button"
+            class="nav-item"
+            [class.active]="activeView() === item.id"
+            (click)="navigate(item.id)"
+          >
+            <span class="nav-icon" aria-hidden="true">{{ item.icon }}</span
+            ><span>{{ item.label }}</span>
+            @if (navBadge(item.id); as badge) {
+              <span class="nav-badge">{{ badge }}</span>
+            }
+          </button>
+        }
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="local-state">
+        <span class="pulse-dot"></span
+        ><span><strong>Modo local</strong><small>localStorage activo</small></span>
+      </div>
+      <button type="button" class="sidebar-user" (click)="logout()">
+        <span class="avatar avatar-small avatar-violet">{{ store.session()?.initials }}</span
+        ><span
+          ><strong>{{ store.session()?.name }}</strong
+          ><small>{{ store.session()?.role }}</small></span
+        ><span class="logout-icon" title="Cerrar sesión">↗</span>
+      </button>
+    </aside>
+
+    @if (menuOpen()) {
+      <button
+        class="mobile-backdrop"
+        type="button"
+        aria-label="Cerrar menú"
+        (click)="menuOpen.set(false)"
+      ></button>
+    }
+
+    <main class="main-area">
+      <header class="topbar">
+        <button
+          class="menu-button"
+          type="button"
+          aria-label="Abrir menú"
+          (click)="menuOpen.set(true)"
+        >
+          ☰
+        </button>
+        <div class="topbar-title">
+          <p class="eyebrow">NOVATEK · GUADALAJARA</p>
+          <h1>{{ pageTitle() }}</h1>
+        </div>
+        <div class="topbar-actions">
+          <label class="global-search"
+            ><span aria-hidden="true">⌕</span
+            ><input
+              type="search"
+              placeholder="Buscar en esta vista"
+              aria-label="Buscar en esta vista"
+              [ngModel]="ui.searchTerm()"
+              (ngModelChange)="ui.searchTerm.set($event)"
+          /></label>
+          <label class="role-switcher"
+            ><span>Perfil</span
+            ><select
+              [ngModel]="store.session()?.role"
+              (ngModelChange)="changeRole($event)"
+              aria-label="Cambiar perfil demo"
+            >
+              @for (role of roles; track role) {
+                <option [value]="role">{{ role }}</option>
+              }
+            </select></label
+          >
+          <button type="button" class="icon-button notification-button" aria-label="Notificaciones">
+            ♢<span>{{ store.pendingRequests().length }}</span>
+          </button>
+        </div>
+      </header>
+      <section class="content-area"><router-outlet /></section>
+    </main>
+  </div>
+
+  @if (ui.employeeModalOpen()) {
+    <div class="modal-backdrop" role="presentation" (click)="ui.closeEmployeeModal()">
+      <section
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="employee-modal-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">ONBOARDING</p>
+            <h2 id="employee-modal-title">Nuevo empleado</h2>
+          </div>
+          <button type="button" aria-label="Cerrar" (click)="ui.closeEmployeeModal()">×</button>
+        </div>
+        <p class="modal-copy">
+          Al guardar, ORBIT iniciará el onboarding y creará una solicitud de equipo para aprobación.
+        </p>
+        <form (ngSubmit)="submitEmployee()" class="form-grid">
+          <label class="field field-wide"
+            ><span>Nombre completo *</span
+            ><input
+              name="employeeName"
+              [(ngModel)]="employeeDraft.name"
+              required
+              placeholder="Ej. Daniela López"
+          /></label>
+          <label class="field field-wide"
+            ><span>Correo empresarial *</span
+            ><input
+              name="employeeEmail"
+              [(ngModel)]="employeeDraft.email"
+              required
+              type="email"
+              placeholder="daniela@novatek.demo"
+          /></label>
+          <label class="field field-wide"
+            ><span>Puesto *</span
+            ><input
+              name="employeePosition"
+              [(ngModel)]="employeeDraft.position"
+              required
+              placeholder="Ej. Backend Developer"
+          /></label>
+          <label class="field"
+            ><span>Departamento</span
+            ><select name="employeeDepartment" [(ngModel)]="employeeDraft.department">
+              <option>Tecnología</option>
+              <option>Producto</option>
+              <option>Recursos Humanos</option>
+              <option>Finanzas</option>
+            </select></label
+          >
+          <label class="field"
+            ><span>Sede</span
+            ><select name="employeeSite" [(ngModel)]="employeeDraft.site">
+              <option>Guadalajara</option>
+              <option>Ciudad de México</option>
+              <option>Monterrey</option>
+              <option>Remoto México</option>
+            </select></label
+          >
+          <label class="field field-wide"
+            ><span>Manager</span
+            ><select name="employeeManager" [(ngModel)]="employeeDraft.manager">
+              <option>Carlos Ramírez</option>
+              <option>Valeria Soto</option>
+              <option>Ana Martínez</option>
+              <option>Ricardo Leal</option>
+            </select></label
+          >
+          <div class="modal-actions field-wide">
+            <button type="button" class="button button-ghost" (click)="ui.closeEmployeeModal()">
+              Cancelar</button
+            ><button type="submit" class="button button-primary">Crear e iniciar onboarding</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  }
+
+  @if (ui.requestModalOpen()) {
+    <div class="modal-backdrop" role="presentation" (click)="ui.closeRequestModal()">
+      <section
+        class="modal modal-small"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="request-modal-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">SOLICITUD INTERNA</p>
+            <h2 id="request-modal-title">Nueva solicitud</h2>
+          </div>
+          <button type="button" aria-label="Cerrar" (click)="ui.closeRequestModal()">×</button>
+        </div>
+        <form (ngSubmit)="submitRequest()" class="form-grid">
+          <label class="field field-wide"
+            ><span>Empleado</span
+            ><select name="requestEmployee" [(ngModel)]="requestDraft.employeeId">
+              @for (employee of store.employees(); track employee.id) {
+                <option [value]="employee.id">{{ employee.name }} · {{ employee.position }}</option>
+              }
+            </select></label
+          >
+          <label class="field field-wide"
+            ><span>Motivo</span
+            ><input name="requestTitle" [(ngModel)]="requestDraft.title" required
+          /></label>
+          <label class="field"
+            ><span>Categoría</span
+            ><select name="requestCategory" [(ngModel)]="requestDraft.category">
+              <option>Equipo de cómputo</option>
+              <option>Periféricos</option>
+              <option>Accesos</option>
+              <option>Otro</option>
+            </select></label
+          >
+          <label class="field"
+            ><span>Prioridad</span
+            ><select name="requestPriority" [(ngModel)]="requestDraft.priority">
+              <option value="Baja">Baja</option>
+              <option value="Media">Media</option>
+              <option value="Alta">Alta</option>
+            </select></label
+          >
+          <div class="modal-actions field-wide">
+            <button type="button" class="button button-ghost" (click)="ui.closeRequestModal()">
+              Cancelar</button
+            ><button type="submit" class="button button-primary">Enviar a aprobación</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  }
+
+  @if (ui.toast()) {
+    <div class="toast" role="status"><span>✓</span>{{ ui.toast() }}</div>
+  }
+}

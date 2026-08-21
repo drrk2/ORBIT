@@ -1,0 +1,68 @@
+<div class="page-intro compact-intro">
+  <div>
+    <h2>Equipo de NovaTek</h2>
+    <p>{{ store.activeEmployees().length }} personas activas en 4 sedes.</p>
+  </div>
+  <button
+    type="button"
+    class="button button-primary"
+    (click)="ui.openEmployeeModal()"
+    [disabled]="!store.hasPermission('employee.write')"
+  >
+    ＋ Nuevo empleado
+  </button>
+</div>
+@if (!store.hasPermission('employee.write')) {
+  <div class="permission-banner">
+    <span>i</span> Estás en modo consulta. Cambia al perfil Recursos Humanos para crear empleados.
+  </div>
+}
+<article class="panel data-panel">
+  <div class="table-toolbar">
+    <div class="filter-chips">
+      <button class="active">Todos {{ store.employees().length }}</button><button>Activos</button
+      ><button>Onboarding</button>
+    </div>
+    <span>{{ filteredEmployees().length }} resultados</span>
+  </div>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Empleado</th>
+          <th>Puesto</th>
+          <th>Departamento</th>
+          <th>Sede</th>
+          <th>Estado</th>
+          <th>Ingreso</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (employee of filteredEmployees(); track employee.id) {
+          <tr>
+            <td>
+              <div class="table-person">
+                <span class="avatar avatar-small avatar-soft">{{ employee.initials }}</span>
+                <div>
+                  <strong>{{ employee.name }}</strong
+                  ><small>{{ employee.email }}</small>
+                </div>
+              </div>
+            </td>
+            <td>{{ employee.position }}</td>
+            <td>{{ employee.department }}</td>
+            <td>{{ employee.site }}</td>
+            <td>
+              <span [class]="statusClass(employee.status)">{{ employee.status }}</span>
+            </td>
+            <td>{{ employee.joinedAt }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="empty-cell">No encontramos empleados con ese criterio.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</article>
